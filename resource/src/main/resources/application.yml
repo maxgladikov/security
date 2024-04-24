@@ -1,0 +1,26 @@
+
+server:
+  port: 10000
+
+
+logging:
+  level:
+    root: DEBUG
+    '[org.springframework]' : DEBUG
+    '[org.springframework.cloud]' : INFO
+
+spring:
+  application:
+    name: resource
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  endpoints:
+    health:
+      enabled: true
+      show-details: always
+    web:
+      exposure:
+        include: [ "prometheus" ]

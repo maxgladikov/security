@@ -1,0 +1,34 @@
+server:
+  port: 10002
+token:
+  keys:
+    public: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAn6H7JtFEekNb6ol2f5qgykoxvfq8ATGhqKlOc/zLxAz9x6p86b6qGCOkr0jqSKTRsUucJRf9m9LulQb4IVHwY2aN+8hdSDSwmrlwe8KsxLZbh5xmLxVYuKBvWSy/pdwtpXYCdf1t8o3irLVw9ANO0bjo/TRuiMf/q4XhAbv36uAGzD22Shz43Z27UhKCu81PCly8GNpyqW1V6k84FF0aBOxlfGVMf9j7T6154FDGSMRQObwnNmi/DDCfKOh4jMDcQN/Masbw05HYyFK6anRjbF1MmgtJLBW7rSMMQrXw/qpRYeE5ocLSv8WzZNtW/WpVEqj49rKDOHtS6OOHCoYINwIDAQAB'
+    private: 'MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCfofsm0UR6Q1vqiXZ/mqDKSjG9+rwBMaGoqU5z/MvEDP3HqnzpvqoYI6SvSOpIpNGxS5wlF/2b0u6VBvghUfBjZo37yF1INLCauXB7wqzEtluHnGYvFVi4oG9ZLL+l3C2ldgJ1/W3yjeKstXD0A07RuOj9NG6Ix/+rheEBu/fq4AbMPbZKHPjdnbtSEoK7zU8KXLwY2nKpbVXqTzgUXRoE7GV8ZUx/2PtPrXngUMZIxFA5vCc2aL8MMJ8o6HiMwNxA38xqxvDTkdjIUrpqdGNsXUyaC0ksFbutIwxCtfD+qlFh4TmhwtK/xbNk21b9alUSqPj2soM4e1Lo44cKhgg3AgMBAAECggEAB34Oz6+ayzJGKifxi+OyEEyTMRuHn3a447WunPsMhVMmxixWWJI+YYuqux9s/6Pcw7mMxqDtolawJAaDtuyln8S8fUjWOAFhGKIDiYuFmGYGvcK1eRhDZccB8umKxTokWlPDoc4XTv8h2IFbn9hX5rgLF3dSiND6Sw6plO9Bn6B5H5DUwxpPramfoJjNfh+RJtYW2dtMManVOKFRgkdgCLkdcaqCe4IWafSwKbptEMq5oC/QrTPYkgT9N8r7Ul0yZKa7UMhX/avX0khSCSAV1zlLgQFnnetNFUM67DZPwVf7tYVb8aN2CzJLFpqYkV3yQC17qizNxZkcEpnQSwSLgQKBgQDfGxgPGX+8gu64JTi+U0xbocT+pmafxnEWFY+/mUpGLkiGwgpbpS38Y/dZUM2fyNv+TRZ2opvcKlPjW537hwdtflbMOzAkxAB/YxefbGuWQdycjQAzd0G30PF8LdyVE9799AIHw64uUjTgXLHS3U7JaDMAHAT7vv8XeW/U3WizhwKBgQC3KyifNK+ljYJL5T3L0kcWKbziZ0m1LbgZAnoMp5vKLRk0DUBL5prbS/6F5NojPFijk09llxX6B67bXMETDFbUzm0KNpu56qE0REMRjQE7FJptR47cgPxhBnIhRa7AJhJ6lhBXkZAssh1zajo64/n0WkEN2vjE3HMa1dP/AcSR0QKBgQC7bBhe/u3G4DtIaMRtZq6bv58syX8ms97mTYCv1UeHA3Sb+EAZUv75qsTsvCuxElx1Gi9HxDyozMoiEiH6XinIOr0R3psIF7vPR+BdZghPds6smOrVUVbc42MqDaDjf4jxz90wxpr5gMe4v0YHPTDlk2pcqi0piv7iqnpe2Q0O2wKBgG3zblMDIVzTcR914H51H07ihwuwzMIBS71Xi0QFaLMYF0Tzn2DwcIyrNYHSOk9kbiDi0Io/A2YvLntnVk7E3Wqo7zNuTFRxz4q8XzYt2ktIttpaVhtvIhBr+h6W4ateL0F+yxiFvHHYCW26mnG3X9eaReq3QxWI719wc+1jdkfBAoGBAJcLLD5CVt8XWJgHm6izIkg38eHNQEXjvNPMgTt8Gng/TV9JbpU3LKhXKFt2DIEQL87vtPsAAebWYLm9PyhjFjamf0OSC+8OWtmHpMwR3WPh/vxZAIPEVEV8mmXFbhaHeWxCsSBIxgw03imOS8ZevNiATxr+wpeJxu9XafIvBMsf'
+  lifetime: 10
+  issuer: avangard
+
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    enabled: true
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://localhost:8000/eureka
+
+spring:
+  application:
+    name: auth-web
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      probes:
+        enabled: true
+    restart:
+      enabled: true

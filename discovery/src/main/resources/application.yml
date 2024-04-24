@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: discovery-service
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    registerWithEureka: false
+    fetchRegistry: false
+
+server:
+  port: 8000
+
+logging:
+  level:
+    root: INFO
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  endpoints:
+    health:
+      enabled: true
+      show-details: always
+    web:
+      exposure:
+        include: health, prometheus
+    metrics:
+      export:
+        prometheus:
+          enabled: true
