@@ -20,12 +20,4 @@ public class DiscoveryService {
     public String getServiceAddress(String serviceName){
         return discoveryClient.getInstances (serviceName).get (0).getUri ().toString ();
     }
-
-    @PostConstruct
-    public void print(){
-        List<ServiceInstance> instances = getInstances ("auth-service");
-        System.out.println (instances.size ());
-        System.out.println (instances.get (0).getUri ().toString ());
-        System.out.println (instances.get (0).getPort ());
-    }
 }

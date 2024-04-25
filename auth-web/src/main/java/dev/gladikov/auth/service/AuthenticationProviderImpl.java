@@ -20,7 +20,6 @@ public class AuthenticationProviderImpl implements AuthenticationProvider {
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        System.out.println (authentication);
         String username = authentication.getName ();
         String password = authentication.getCredentials ().toString ();
         UserDetails u = userDetailsService.loadUserByUsername (username);

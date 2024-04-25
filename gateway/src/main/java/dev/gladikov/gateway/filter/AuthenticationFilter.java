@@ -2,8 +2,11 @@ package dev.gladikov.gateway.filter;
 
 
 import dev.gladikov.gateway.rest.client.AuthServiceClient;
+import dev.gladikov.gateway.rest.dto.JwtVerificationResponse;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.auth.AuthenticationException;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
@@ -11,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
@@ -27,21 +31,14 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
         ServerHttpRequest request = exchange.getRequest ();
         if (specification.isSecured.test (request)) {
             if (specification.isAuthBearer.test (request)) {
-                final String token = this.getAuthHeader (request);
-                client.validateToken (token).doOnError (e -> onError (exchange, "Token authorization failed", HttpStatus.UNAUTHORIZED));
-                return null;
-            } else {
-                return this.onError (exchange, "Authorization header is missing", HttpStatus.UNAUTHORIZED);
-            }
-
-
-//            if (jwtUtil.isInvalid(token))
-//                return this.onError(exchange, "Authorization header is invalid", HttpStatus.UNAUTHORIZED);
-
-//            this.populateRequestWithHeaders(exchange, token);
-//            return chain.filter (exchange);
+                final Result result = new Result (chain, exchange);
+                return client.validateToken (getAuthHeader (request))
+                    .flatMap (result::populateRequestWithHeaders)
+                    .onErrorResume (result::onError);
+            } else
+                return onError (exchange);
         }
-        return null;
+        return chain.filter (exchange);
     }
 
     @Override
@@ -49,25 +46,43 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
         return -1;
     }
 
-    private Mono<Void> onError(ServerWebExchange exchange, String err, HttpStatus httpStatus) {
-        ServerHttpResponse response = exchange.getResponse();
-        response.setStatusCode(httpStatus);
-        return response.setComplete();
+    private Mono<Void> onError(ServerWebExchange exchange) {
+        ServerHttpResponse response = exchange.getResponse ();
+        response.setStatusCode (HttpStatus.UNAUTHORIZED);
+        return response.setComplete ();
     }
 
     private String getAuthHeader(ServerHttpRequest request) {
-        return request.getHeaders().getOrEmpty("Authorization").get(0);
+        return request.getHeaders ().getOrEmpty ("Authorization").get (0).replace ("Bearer ", "");
     }
 
-    private boolean isAuthMissing(ServerHttpRequest request) {
-        return !request.getHeaders().containsKey("Authorization");
-    }
+    private static class Result {
 
-//    private void populateRequestWithHeaders(ServerWebExchange exchange, String token) {
-//        Claims claims = jwtUtil.getAllClaimsFromToken(token);
-//        exchange.getRequest().mutate()
-//            .header("id", String.valueOf(claims.get("id")))
-//            .header("role", String.valueOf(claims.get("role")))
-//            .build();
-//    }
+        private final GatewayFilterChain chain;
+        private final ServerWebExchange exchange;
+        private final ServerHttpResponse response;
+
+        public Result(GatewayFilterChain chain, ServerWebExchange exchange) {
+            this.exchange = exchange;
+            this.chain = chain;
+            this.response = exchange.getResponse ();
+        }
+
+        public Mono<Void> populateRequestWithHeaders(JwtVerificationResponse claims) {
+            log.info ("populating");
+            ServerHttpRequest request =exchange.getRequest ().mutate ()
+                .header ("user", claims.email ())
+                .header ("roles", claims.roles ())
+                .build ();
+            ServerWebExchange newExchange = exchange.mutate().request(request).build();
+            return chain.filter(newExchange);
+        }
+
+        public Mono<Void> onError(Throwable e) {
+            log.info ("set error");
+            response.setStatusCode (HttpStatus.UNAUTHORIZED);
+            return response.setComplete ();
+        }
+
+    }
 }

@@ -62,7 +62,7 @@ public class JwtService {
     public String generateToken(UserDetails user) {
         return Jwts.builder ()
             .claims ()
-            .add ("authorities", user.getAuthorities ())
+            .add ("Roles", user.getAuthorities ())
             .id (UUID.randomUUID ().toString ())
             .issuer (issuer)
             .and ()
@@ -75,7 +75,7 @@ public class JwtService {
     public JwtAuthenticationResponse generateToken(Authentication user) {
         String token = Jwts.builder ()
             .claims ()
-            .add ("authorities", user.getAuthorities ().stream ().map (GrantedAuthority::getAuthority)
+            .add ("Roles", user.getAuthorities ().stream ().map (GrantedAuthority::getAuthority)
                 .collect (Collectors.joining (", ")))
             .subject ((String) user.getPrincipal ())
             .id (UUID.randomUUID ().toString ())
@@ -95,8 +95,6 @@ public class JwtService {
         return true;
     }
 
-    public Function<String,String> validate = token -> {validateToken (token); return token;};
-    public Function<String, Map<String,String>> userAndRoles = token ->
 
     public String extractUserName(String token) {
         return extractClaim (token, Claims::getSubject);
@@ -110,6 +108,14 @@ public class JwtService {
         return extractClaim (token, Claims::getExpiration);
     }
 
+    private String extractSubject(String token) {
+        return extractClaim (token, Claims::getSubject);
+    }
+
+    public String extractRoles(String token) {
+        return extractAllClaims (token).get ("Roles",String.class);
+    }
+
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolvers) {
         final Claims claims = extractAllClaims (token);
         return claimsResolvers.apply (claims);
@@ -118,11 +124,6 @@ public class JwtService {
     private Claims extractAllClaims(String token) {
         return Jwts.parser ()
             .verifyWith (publicKey).build ().parseSignedClaims (token).getPayload ();
-    }
-
-    private static SecretKey getSymmetricSigningKey(String symmetricKey) {
-        byte[] keyBytes = Decoders.BASE64.decode (symmetricKey);
-        return Keys.hmacShaKeyFor (keyBytes);
     }
 
     public static PublicKey getPublicKeyFromString(String key) {
@@ -156,22 +157,6 @@ public class JwtService {
         }
         return pri;
     }
-
-    public static String generateRandomSymmetricKey() {
-        SecretKey key = Jwts.SIG.HS256.key ().build ();
-        return Encoders.BASE64.encode (key.getEncoded ());
-    }
-
-    public static Map<String, String> generateAsymmetricKeys() {
-        KeyPair keyPair = Jwts.SIG.RS256.keyPair ().build ();
-        PrivateKey pri = keyPair.getPrivate ();
-        PublicKey pub = keyPair.getPublic ();
-        Map<String, String> map = new HashMap<> ();
-        map.put ("private", Encoders.BASE64.encode (pri.getEncoded ()));
-        map.put ("public", Encoders.BASE64.encode (pub.getEncoded ()));
-        return map;
-    }
-
 
 }
 

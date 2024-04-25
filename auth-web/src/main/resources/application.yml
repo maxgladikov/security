@@ -22,13 +22,13 @@ spring:
     name: auth-web
 
 management:
+  tracing:
+    sampling:
+      probability: 1.0
   endpoints:
+    health:
+      enabled: true
+      show-details: always
     web:
       exposure:
-        include: "*"
-  endpoint:
-    health:
-      probes:
-        enabled: true
-    restart:
-      enabled: true
+        include: [ "prometheus" ]

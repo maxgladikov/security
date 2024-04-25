@@ -2,9 +2,11 @@ package dev.gladikov.auth.controller;
 
 import dev.gladikov.auth.dto.JwtAuthenticationResponse;
 import dev.gladikov.auth.dto.JwtVerificationRequest;
+import dev.gladikov.auth.dto.JwtVerificationResponse;
 import dev.gladikov.auth.dto.SignInRequest;
 import dev.gladikov.auth.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth")
+@Slf4j
 public class AuthController {
 
     private final AuthenticationService service;
@@ -25,10 +28,10 @@ public class AuthController {
     }
 
     @PostMapping("/verify")
-    public ResponseEntity<?> verify(@RequestBody JwtVerificationRequest request) {
+    public ResponseEntity<JwtVerificationResponse> verify(@RequestBody JwtVerificationRequest request) {
+        log.info ("*** verify called ***");
         try {
-            service.validate (request.getToken ());
-            return ResponseEntity.ok().build ();
+            return  ResponseEntity.ok(service.validate (request.getToken ()));
         }catch (Exception e){
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }

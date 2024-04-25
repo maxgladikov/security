@@ -11,10 +11,11 @@ spring:
           uri: http://localhost:10000
           predicates:
             - Path=/resource/**
+
         - id: login
-          uri: http://localhost:10001
+          uri: http://localhost:10002
           predicates:
-            - Path=/auth/**
+            - Path=/auth/auth/**
 
 endpoints:
   opened:

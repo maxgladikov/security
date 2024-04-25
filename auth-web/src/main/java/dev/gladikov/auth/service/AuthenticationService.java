@@ -1,6 +1,7 @@
 package dev.gladikov.auth.service;
 
 import dev.gladikov.auth.dto.JwtAuthenticationResponse;
+import dev.gladikov.auth.dto.JwtVerificationResponse;
 import dev.gladikov.auth.dto.SignInRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,8 +16,9 @@ public class AuthenticationService {
     private final AuthenticationProviderImpl authenticationProvider;
 
 
-    public void validate(String token) {
-        jwtService.validate (token);
+    public JwtVerificationResponse validate(String token) {
+        jwtService.validateToken (token);
+        return new JwtVerificationResponse (jwtService.extractUserName (token),jwtService.extractRoles (token) );
     }
 
 
